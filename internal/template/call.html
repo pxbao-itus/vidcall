@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Video Call</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body>
+<h1>Call Room: {{.RoomID}}</h1>
+
+<div id="videos">
+    <video id="localVideo" autoplay playsinline muted></video>
+    <video id="remoteVideo" autoplay playsinline></video>
+</div>
+
+<button id="hangupBtn">Hang Up</button>
+
+<script>
+    // Use a public STUN server
+    const peerConnection = new RTCPeerConnection({
+        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+    });
+
+    // 1. Insert user's camera and microphone
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        .then(stream => {
+            document.getElementById('localVideo').srcObject = stream;
+            stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
+        });
+
+    // 2. Setup WebSocket for signaling
+    const roomID = "{{.RoomID}}"; // Injected by Go template
+    const ws = new WebSocket(`ws://${window.location.host}/rooms/${roomID}/ws`);
+
+    ws.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+        // Logic to handle SDP offers, answers, and ICE candidates from the other peer
+        // e.g., if (message.offer) { peerConnection.setRemoteDescription... }
+    };
+
+    // ... more JS logic to create offers, handle ICE candidates, etc. ...
+</script>
+</body>
+</html>
