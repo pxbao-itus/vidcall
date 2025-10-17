@@ -19,10 +19,7 @@ var Module = fx.Module("room",
 			fx.As(new(repository.Repository[string, Room])),
 		),
 	),
-	fx.Provide(
-		fx.Private,
-		NewService,
-	),
+	fx.Provide(NewService),
 	fx.Provide(NewHandler),
 )
 
@@ -53,6 +50,7 @@ func (handler *Handler) CreateRoom(w http.ResponseWriter, r *http.Request) {
 	}
 
 	room.ID = ulid.Make().String()
+	room.CreatedBy, _ = common.GetUserID(r)
 	if _, err := handler.service.CreateRoom(r.Context(), room); err != nil {
 		http.Error(w, "Failed to create room", http.StatusInternalServerError)
 		return
@@ -65,7 +63,7 @@ func (handler *Handler) CreateRoom(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handler *Handler) GetRoom(w http.ResponseWriter, r *http.Request) {
-	roomID := r.URL.Query().Get("roomID")
+	roomID := common.GetParam(r, "roomID")
 	if roomID == "" {
 		http.Error(w, "Missing room ID", http.StatusBadRequest)
 		return
@@ -84,7 +82,7 @@ func (handler *Handler) GetRoom(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handler *Handler) DeleteRoom(w http.ResponseWriter, r *http.Request) {
-	roomID := r.URL.Query().Get("roomID")
+	roomID := common.GetParam(r, "roomID")
 	if roomID == "" {
 		http.Error(w, "Missing room ID", http.StatusBadRequest)
 		return
@@ -99,6 +97,12 @@ func (handler *Handler) DeleteRoom(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handler *Handler) ListRooms(w http.ResponseWriter, r *http.Request) {
+	var req ListRoomRequest
+	if err := common.BindRequest(r, &req); err != nil {
+		http.Error(w, "Invalid request payload: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	rooms, err := handler.service.ListRooms(r.Context())
 	if err != nil {
 		http.Error(w, "Failed to list rooms", http.StatusInternalServerError)

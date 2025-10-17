@@ -4,6 +4,8 @@ import (
 	"vidcall/app"
 	"vidcall/config"
 	"vidcall/internal/module/room"
+	"vidcall/internal/module/rtc"
+	"vidcall/internal/module/user"
 	"vidcall/internal/module/view"
 	"vidcall/pkg/log"
 
@@ -22,6 +24,8 @@ func main() {
 		log.Module,
 		app.Module,
 		room.Module,
+		rtc.Module,
+		user.Module,
 		view.Module,
 
 		fx.Invoke(app.Invoke()),

@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"vidcall/internal/module/room"
+	"vidcall/internal/module/rtc"
+	"vidcall/internal/module/user"
 	"vidcall/internal/module/view"
 
 	"github.com/go-chi/chi/v5"
@@ -24,9 +26,10 @@ var Module = fx.Module("rest",
 type RouterParams struct {
 	fx.In
 
-	// Add other dependencies here if needed
 	RoomHandler *room.Handler
 	ViewHandler *view.Handler
+	UserHandler *user.Handler
+	RTCHandler  *rtc.Handler
 }
 
 func NewRouter(params RouterParams) *chi.Mux {
@@ -42,13 +45,18 @@ func NewRouter(params RouterParams) *chi.Mux {
 	router.Get("/health", healthCheck)
 
 	router.Get("/", params.ViewHandler.RenderHomepage)
-	router.Get("/call", params.ViewHandler.RenderCallPage)
+	router.Get("/call/{roomID}", params.ViewHandler.RenderCallPage)
 
 	router.Get("/rooms", params.RoomHandler.ListRooms)
 	router.Post("/rooms", params.RoomHandler.CreateRoom)
 	router.Get("/rooms/{roomID}", params.RoomHandler.GetRoom)
-	router.Get("/rooms/{roomID}/ws", nil)
 	router.Delete("/rooms/{roomID}", params.RoomHandler.DeleteRoom)
+
+	router.Get("/users", params.UserHandler.ListUsers)
+	router.Post("/users", params.UserHandler.CreateUser)
+	router.Get("/users/{userID}", params.UserHandler.GetUser)
+
+	router.Get("/ws/{roomID}", params.RTCHandler.JoinRoom)
 
 	return router
 }

@@ -38,6 +38,11 @@ func (r *SyncRepository[V, T]) Find(ctx context.Context, v V) (T, error) {
 	return t, nil
 }
 
+func (r *SyncRepository[V, T]) Update(ctx context.Context, t T) (T, error) {
+	r.m.Store(t.Id(), t)
+	return t, nil
+}
+
 func (r *SyncRepository[V, T]) Delete(ctx context.Context, v V) error {
 	r.m.Delete(v)
 	return nil
