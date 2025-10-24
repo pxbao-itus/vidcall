@@ -36,11 +36,17 @@ func BindRequest[T any](r *http.Request, t T) error {
 }
 
 func GetUserID(r *http.Request) (string, error) {
-	// temporary consider user id as client ip
+	// Check X-User-ID header first (for regular HTTP requests)
 	if userId := r.Header.Get("X-User-ID"); userId != "" {
 		return userId, nil
 	}
 
+	// Check query parameter (for WebSocket connections)
+	if userId := r.URL.Query().Get("userId"); userId != "" {
+		return userId, nil
+	}
+
+	// Fallback to remote address
 	return r.RemoteAddr, nil
 }
 

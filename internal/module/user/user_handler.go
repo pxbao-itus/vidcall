@@ -80,7 +80,7 @@ func (handler *Handler) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, err := handler.service.CreateUser(r.Context(), user); err != nil {
+	if _, err := handler.service.CreateOrUpdateUser(r.Context(), user); err != nil {
 		http.Error(w, "Failed to create user", http.StatusInternalServerError)
 		return
 	}

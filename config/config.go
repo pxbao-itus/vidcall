@@ -14,7 +14,11 @@ func NewConfig(params ConfigParams) ConfigResult {
 
 	config := Config{
 		HttpServer: HttpServer{
-			Port: "8080",
+			Host:     "0.0.0.0",
+			Port:     "8080",
+			UseHTTPS: true,
+			CertFile: "certs/cert.pem",
+			KeyFile:  "certs/key.pem",
 		},
 	}
 

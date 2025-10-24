@@ -22,8 +22,11 @@ type ConfigResult struct {
 }
 
 type HttpServer struct {
-	Host string
-	Port string
+	Host     string
+	Port     string
+	UseHTTPS bool
+	CertFile string
+	KeyFile  string
 }
 
 func (h HttpServer) ToAddr() string {

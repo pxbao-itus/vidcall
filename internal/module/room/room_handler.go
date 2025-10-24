@@ -1,6 +1,7 @@
 package room
 
 import (
+	"cmp"
 	"net/http"
 
 	"vidcall/internal/common"
@@ -49,7 +50,7 @@ func (handler *Handler) CreateRoom(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	room.ID = ulid.Make().String()
+	room.ID = cmp.Or(room.ID, ulid.Make().String())
 	room.CreatedBy, _ = common.GetUserID(r)
 	if _, err := handler.service.CreateRoom(r.Context(), room); err != nil {
 		http.Error(w, "Failed to create room", http.StatusInternalServerError)
@@ -85,6 +86,26 @@ func (handler *Handler) DeleteRoom(w http.ResponseWriter, r *http.Request) {
 	roomID := common.GetParam(r, "roomID")
 	if roomID == "" {
 		http.Error(w, "Missing room ID", http.StatusBadRequest)
+		return
+	}
+
+	// Get the current user ID
+	userID, err := common.GetUserID(r)
+	if err != nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	// Get the room to check ownership
+	room, err := handler.service.GetRoom(r.Context(), roomID)
+	if err != nil {
+		http.Error(w, "Room not found", http.StatusNotFound)
+		return
+	}
+
+	// Check if the user is the room owner
+	if room.CreatedBy != userID {
+		http.Error(w, "Forbidden: Only room owner can delete this room", http.StatusForbidden)
 		return
 	}
 

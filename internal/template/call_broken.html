@@ -1,234 +1,201 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<html>
+            border-radius: 8px;
     <title>Video Call - Room {{.RoomID}}</title>
-    <style>
-        * {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
             margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            color: #4CAF50;
         }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #fff;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        .app-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-
-        .header {
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            padding: 15px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .room-info h1 {
-            font-size: 1.2em;
-            font-weight: 600;
-        }
-
-        .room-id {
-            font-size: 0.85em;
-            color: rgba(255, 255, 255, 0.7);
-            background: rgba(255, 255, 255, 0.1);
-            padding: 4px 12px;
-            border-radius: 20px;
-            margin-left: 10px;
-        }
-
-        #status {
-            font-size: 0.9em;
-            color: #a5d6a7;
-            padding: 6px 15px;
+            height: auto;
+            padding: 10px;
+            margin: 10px 0;
             background: rgba(76, 175, 80, 0.2);
-            border-radius: 20px;
         }
-
-        .main-container {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        .video-section {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-        }
-
-        #videos {
-            flex: 1;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 14px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 15px;
-            overflow-y: auto;
-        }
-
-        .video-container {
-            position: relative;
             background: #000;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            aspect-ratio: 16/9;
+            text-align: center;
+            margin: 20px 0;
+            transform: translateY(-5px);
         }
-
+            padding: 10px 20px;
+            margin: 0 5px;
         video {
-            width: 100%;
+            border-radius: 4px;
             height: 100%;
-            object-fit: cover;
-        }
+            font-size: 16px;
+            font-size: 1.1em;
 
-        .video-label {
-            position: absolute;
-            bottom: 15px;
-            left: 15px;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.9em;
-        }
-
+            background-color: #f44336;
         #controls {
             padding: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
+            backdrop-filter: blur(10px);
+            background-color: #da190b;
         }
-
-        button {
-            padding: 14px 28px;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 0.95em;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
         .mute-btn {
-            background: #667eea;
+            background-color: #2196F3;
+            color: white;
+            display: flex;
+        .mute-btn:hover {
+            background-color: #0b7dda;
+        }
+            flex-wrap: wrap;
+            background: #2a2a2a;
+            border-radius: 8px;
+        <div class="video-section">
+            <div id="videos">
+            height: 600px;
+                    <video id="localVideo" autoplay playsinline muted></video>
+                </div>
+            padding: 15px;
+            background: #333;
+            border-radius: 8px 8px 0 0;
+            border-bottom: 2px solid #4CAF50;
+                    📹 Video
+                <button id="hangupBtn" title="Leave Call">
+            margin: 0;
+            color: #4CAF50;
+            </div>
+                <form class="chat-input-form" id="chatForm">
+                    <input type="text" id="chatInput" placeholder="Type a message..." autocomplete="off" maxlength="500" />
+                    <button type="submit">Send</button>
+            padding: 15px;
             color: white;
         }
-
-        .mute-btn.muted {
-            background: #f44336;
-        }
-
+            gap: 10px;
         #hangupBtn {
-            background: #f44336;
-            color: white;
-        }
-
-        .chat-container {
             width: 380px;
-            background: rgba(255, 255, 255, 0.95);
-            display: flex;
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 80%;
             flex-direction: column;
         }
-
-        .chat-header {
-            padding: 20px;
-            background: #667eea;
-            color: white;
+            font-weight: 600;
+            background: rgba(76, 175, 80, 0.2);
+            color: #a5d6a7;
+        .participant-count {
+            margin-left: auto;
+            max-width: 100%;
+            font-size: 0.9em;
         }
-
         .chat-messages {
-            flex: 1;
-            overflow-y: auto;
+            background: #424242;
             padding: 20px;
-            background: #f5f7fa;
             display: flex;
-            flex-direction: column;
             gap: 12px;
-        }
+            background: #4CAF50;
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
 
-        .chat-message {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            color: #4CAF50;
+        .chat-messages::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            color: #fff;
+
             padding: 12px 16px;
-            border-radius: 16px;
-            max-width: 75%;
-        }
+            font-size: 0.75em;
+            color: #999;
+            margin-top: 5px;
+            animation: slideIn 0.3s ease;
+
+            padding: 15px;
+            background: #333;
+            border-radius: 0 0 8px 8px;
+            border-top: 1px solid #444;
+                transform: translateY(10px);
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
 
         .chat-message.system {
-            background: #e8f5e9;
-            color: #2e7d32;
-            font-style: italic;
-            text-align: center;
-            max-width: 90%;
-            align-self: center;
-        }
+            padding: 10px;
+            border: 2px solid #444;
+            border-radius: 4px;
+            background: #2a2a2a;
+            color: #fff;
+            font-size: 14px;
+            padding: 8px 16px;
 
         .chat-message.user {
-            background: white;
-            color: #333;
+            border-color: #4CAF50;
             align-self: flex-start;
         }
-
-        .chat-message.own {
-            background: #667eea;
+            padding: 10px 20px;
+            background: #4CAF50;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            align-self: flex-end;
+            border-radius: 4px;
         }
 
-        .message-sender {
             font-weight: 700;
-            margin-bottom: 4px;
             font-size: 0.85em;
-        }
+            background: #45a049;
 
-        .message-time {
-            font-size: 0.7em;
-            opacity: 0.7;
-            margin-top: 6px;
-        }
+        .chat-input-form button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+<h1>Video Call Room: {{.RoomID}}</h1>
+<div id="status">Connecting...</div>
 
-        .chat-input-container {
-            padding: 20px;
-            background: white;
-        }
-
-        .chat-input-form {
-            display: flex;
-            gap: 10px;
-        }
-
-        .chat-input-form input {
-            flex: 1;
-            padding: 14px 18px;
-            border: 2px solid #e0e0e0;
-            border-radius: 25px;
-            font-size: 0.95em;
-        }
-
-        .chat-input-form button {
-            background: #667eea;
-            color: white;
-        }
-
-        @media (max-width: 768px) {
-            .main-container {
-                flex-direction: column;
+            .video-section {
+                padding: 10px;
             }
 
-            .chat-container {
-                width: 100%;
-                height: 40vh;
+            #videos {
+                grid-template-columns: 1fr;
+                gap: 10px;
             }
+
+            .header {
+                padding: 12px 15px;
+            }
+
+            .room-name {
+                font-size: 1em;
+            }
+
+            button {
+                padding: 12px 20px;
+                font-size: 0.85em;
+            }
+        const statusEl = document.getElementById('status');
+        const isConnecting = message.includes('Connecting') || message.includes('ready');
+
+        statusEl.innerHTML = `
+            <span class="status-dot"></span>
+            ${isConnecting ? '<span class="loading-spinner"></span>' : ''}
+            <span>${message}</span>
+        `;
+
+        // Update participant count
+        const count = Object.keys(peerConnections).length + 1; // +1 for self
+        const participantEl = document.getElementById('participantCount');
+        if (participantEl) {
+            participantEl.textContent = `${count} participant${count > 1 ? 's' : ''}`;
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #4CAF50;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -236,41 +203,43 @@
 <div class="app-container">
     <div class="header">
         <div class="room-info">
-            <h1>🎥 Video Call <span class="room-id">{{.RoomID}}</span></h1>
+            <span class="room-name">🎥 Video Call</span>
+            <span class="room-id">Room: {{.RoomID}}</span>
         </div>
-        <div id="status">Connecting...</div>
+        <div id="status">
+            <span class="status-dot"></span>
+            <span class="loading-spinner"></span>
+            <span>Connecting...</span>
+        </div>
     </div>
-
-    <div class="main-container">
-        <div class="video-section">
-            <div id="videos">
-                <div class="video-container">
-                    <video id="localVideo" autoplay playsinline muted></video>
-                    <div class="video-label">You</div>
-                </div>
-            </div>
-            <div id="controls">
-                <button id="muteAudioBtn" class="mute-btn">🎤 Audio</button>
-                <button id="muteVideoBtn" class="mute-btn">📹 Video</button>
-                <button id="hangupBtn">📞 Leave</button>
+<div class="main-container">
+    <div class="video-section">
+        <div id="videos">
+            <div class="video-container">
+                <video id="localVideo" autoplay playsinline muted></video>
+                <div class="video-label">You (Local)</div>
             </div>
         </div>
-
-        <div class="chat-container">
-            <div class="chat-header">
-                <h3>💬 Chat</h3>
-            </div>
-            <div class="chat-messages" id="chatMessages"></div>
-            <div class="chat-input-container">
-                <form class="chat-input-form" id="chatForm">
-                    <input type="text" id="chatInput" placeholder="Type a message..." autocomplete="off" maxlength="500" />
-                    <button type="submit">Send</button>
-                </form>
-            </div>
+        <div id="controls">
+            <button id="muteAudioBtn" class="mute-btn">Mute Audio</button>
+            <button id="muteVideoBtn" class="mute-btn">Mute Video</button>
+            <button id="hangupBtn">Hang Up</button>
+        </div>
+    </div>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h3>💬 Chat</h3>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+        </div>
+        <div class="chat-input-container">
+            <form class="chat-input-form" id="chatForm">
+                <input type="text" id="chatInput" placeholder="Type a message..." autocomplete="off" maxlength="500" />
+                <button type="submit">Send</button>
+            </form>
         </div>
     </div>
 </div>
-
 <script>
     const roomID = "{{.RoomID}}";
     let localStream = null;
@@ -279,43 +248,36 @@
     let audioMuted = false;
     let videoMuted = false;
     let currentUserId = '';
-
     const iceServers = {
         iceServers: [
             { urls: 'stun:stun.l.google.com:19302' },
             { urls: 'stun:stun1.l.google.com:19302' }
         ]
     };
-
     async function startLocalStream() {
         try {
             const urlParams = new URLSearchParams(window.location.search);
             currentUserId = urlParams.get('userId') || localStorage.getItem('userId') || 'Anonymous';
-
             localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
             document.getElementById('localVideo').srcObject = localStream;
-            updateStatus('Connected - Ready');
+            updateStatus('Media ready - Connecting to room...');
         } catch (error) {
             console.error('Error accessing media devices:', error);
             updateStatus('Error: Could not access camera/microphone');
         }
     }
-
     function setupWebSocket() {
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const wsUrl = `${protocol}//${window.location.host}/ws/rooms/${roomID}?userId=${encodeURIComponent(currentUserId)}`;
         console.log('Connecting to WebSocket:', wsUrl);
         ws = new WebSocket(wsUrl);
-
         ws.onopen = () => {
             console.log('WebSocket connected');
             updateStatus('Connected to room');
         };
-
         ws.onmessage = async (event) => {
             const message = JSON.parse(event.data);
             console.log('Received message:', message);
-
             switch (message.event || message.Event) {
                 case 'new_comer':
                     await handleNewPeer(message.data || message.Data);
@@ -341,27 +303,22 @@
                     break;
             }
         };
-
         ws.onerror = (error) => {
             console.error('WebSocket error:', error);
             updateStatus('Connection error');
         };
-
         ws.onclose = () => {
             console.log('WebSocket closed');
             updateStatus('Disconnected');
         };
     }
-
     function createPeerConnection(peerID) {
         const pc = new RTCPeerConnection(iceServers);
-
         if (localStream) {
             localStream.getTracks().forEach(track => {
                 pc.addTrack(track, localStream);
             });
         }
-
         pc.onicecandidate = (event) => {
             if (event.candidate) {
                 ws.send(JSON.stringify({
@@ -375,40 +332,32 @@
                 }));
             }
         };
-
         pc.ontrack = (event) => {
             console.log('Received remote track from', peerID);
             addRemoteVideo(peerID, event.streams[0]);
         };
-
         pc.onconnectionstatechange = () => {
             console.log('Connection state:', pc.connectionState, 'for peer', peerID);
             if (pc.connectionState === 'connected') {
                 updateStatus(`Connected with ${Object.keys(peerConnections).length} peer(s)`);
             }
         };
-
         peerConnections[peerID] = pc;
         return pc;
     }
-
     async function handleNewPeer(peer) {
         console.log('New peer joined:', peer);
         const peerID = peer.id || peer.ID || peer;
         const peerName = peer.display_name || peerID;
-
         displaySystemMessage(`${peerName} joined the room`);
-
         if (peerConnections[peerID]) {
             console.log('Peer connection already exists for', peerID);
             return;
         }
-
         const pc = createPeerConnection(peerID);
         try {
             const offer = await pc.createOffer();
             await pc.setLocalDescription(offer);
-
             ws.send(JSON.stringify({
                 event: 'offer',
                 to: peerID,
@@ -418,23 +367,18 @@
             console.error('Error creating offer:', error);
         }
     }
-
     async function handleOffer(message) {
         const peerID = message.from || message.From;
         console.log('Received offer from', peerID);
-
         const pc = peerConnections[peerID] || createPeerConnection(peerID);
-
         try {
             const data = message.data || message.Data;
             await pc.setRemoteDescription(new RTCSessionDescription({
                 type: 'offer',
                 sdp: data.sdp || data.Sdp
             }));
-
             const answer = await pc.createAnswer();
             await pc.setLocalDescription(answer);
-
             ws.send(JSON.stringify({
                 event: 'answer',
                 to: peerID,
@@ -444,11 +388,9 @@
             console.error('Error handling offer:', error);
         }
     }
-
     async function handleAnswer(message) {
         const peerID = message.from || message.From;
         console.log('Received answer from', peerID);
-
         const pc = peerConnections[peerID];
         if (pc) {
             try {
@@ -462,11 +404,11 @@
             }
         }
     }
-
     async function handleIceCandidate(message) {
         const peerID = message.from || message.From;
-        const pc = peerConnections[peerID];
-
+            const btn = document.getElementById('muteAudioBtn');
+            btn.innerHTML = audioMuted ? '🔇 Audio Off' : '🎤 Audio';
+            btn.classList.toggle('muted', audioMuted);
         if (pc) {
             try {
                 const data = message.data || message.Data;
@@ -475,25 +417,22 @@
                 console.error('Error adding ICE candidate:', error);
             }
         }
-    }
-
+            const btn = document.getElementById('muteVideoBtn');
+            btn.innerHTML = videoMuted ? '📵 Video Off' : '📹 Video';
+            btn.classList.toggle('muted', videoMuted);
     function addRemoteVideo(peerID, stream) {
         let videoContainer = document.getElementById(`video-${peerID}`);
-
         if (!videoContainer) {
             videoContainer = document.createElement('div');
             videoContainer.id = `video-${peerID}`;
             videoContainer.className = 'video-container';
-
             const video = document.createElement('video');
             video.autoplay = true;
             video.playsinline = true;
             video.srcObject = stream;
-
             const label = document.createElement('div');
             label.className = 'video-label';
-            label.textContent = `${peerID.substring(0, 8)}`;
-
+            label.textContent = `Peer ${peerID.substring(0, 8)}`;
             videoContainer.appendChild(video);
             videoContainer.appendChild(label);
             document.getElementById('videos').appendChild(videoContainer);
@@ -501,81 +440,62 @@
             videoContainer.querySelector('video').srcObject = stream;
         }
     }
-
     function handlePeerLeft(peer) {
         const peerID = peer.id || peer.ID || peer;
         const peerName = peer.display_name || peerID;
         console.log('Peer left:', peerID);
-
         displaySystemMessage(`${peerName} left the room`);
-
         if (peerConnections[peerID]) {
             peerConnections[peerID].close();
             delete peerConnections[peerID];
         }
-
         const videoContainer = document.getElementById(`video-${peerID}`);
         if (videoContainer) {
             videoContainer.remove();
         }
-
         updateStatus(`Connected with ${Object.keys(peerConnections).length} peer(s)`);
     }
-
     function updateStatus(message) {
         document.getElementById('status').textContent = message;
     }
-
     function hangup() {
         Object.values(peerConnections).forEach(pc => pc.close());
         peerConnections = {};
-
         if (localStream) {
             localStream.getTracks().forEach(track => track.stop());
         }
-
         if (ws) {
             ws.close();
         }
-
         setTimeout(() => {
             window.location.href = '/';
         }, 1000);
     }
-
     function toggleAudio() {
         if (localStream) {
             audioMuted = !audioMuted;
             localStream.getAudioTracks().forEach(track => {
                 track.enabled = !audioMuted;
             });
-            const btn = document.getElementById('muteAudioBtn');
-            btn.innerHTML = audioMuted ? '🔇 Audio Off' : '🎤 Audio';
-            btn.classList.toggle('muted', audioMuted);
+            document.getElementById('muteAudioBtn').textContent = audioMuted ? 'Unmute Audio' : 'Mute Audio';
         }
     }
-
     function toggleVideo() {
         if (localStream) {
             videoMuted = !videoMuted;
             localStream.getVideoTracks().forEach(track => {
                 track.enabled = !videoMuted;
             });
-            const btn = document.getElementById('muteVideoBtn');
-            btn.innerHTML = videoMuted ? '📵 Video Off' : '📹 Video';
-            btn.classList.toggle('muted', videoMuted);
+            document.getElementById('muteVideoBtn').textContent = videoMuted ? 'Unmute Video' : 'Mute Video';
         }
     }
-
     document.getElementById('chatForm').addEventListener('submit', function(e) {
         e.preventDefault();
         sendChatMessage();
     });
-
     function sendChatMessage() {
         const input = document.getElementById('chatInput');
         const message = input.value.trim();
-
         if (message && ws && ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({
                 event: 'chat_message',
@@ -585,68 +505,53 @@
                     timestamp: Date.now()
                 }
             }));
-
             displayChatMessage({
                 sender: currentUserId,
                 message: message,
                 timestamp: Date.now(),
                 isOwn: true
             });
-
             input.value = '';
         }
     }
-
     function displayChatMessage(data) {
         const messagesContainer = document.getElementById('chatMessages');
         const messageDiv = document.createElement('div');
         messageDiv.className = data.isOwn ? 'chat-message own' : 'chat-message user';
-
         const time = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
         messageDiv.innerHTML = `
             ${!data.isOwn ? `<div class="message-sender">${escapeHtml(data.sender)}</div>` : ''}
             <div class="message-text">${escapeHtml(data.message)}</div>
             <div class="message-time">${time}</div>
         `;
-
         messagesContainer.appendChild(messageDiv);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
-
     function displaySystemMessage(message) {
         const messagesContainer = document.getElementById('chatMessages');
         const messageDiv = document.createElement('div');
         messageDiv.className = 'chat-message system';
-
         const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
         messageDiv.innerHTML = `
             <div class="message-text">🔔 ${escapeHtml(message)}</div>
             <div class="message-time">${time}</div>
         `;
-
         messagesContainer.appendChild(messageDiv);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
-
     function escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
-
     document.getElementById('hangupBtn').addEventListener('click', hangup);
     document.getElementById('muteAudioBtn').addEventListener('click', toggleAudio);
     document.getElementById('muteVideoBtn').addEventListener('click', toggleVideo);
-
     async function init() {
         await startLocalStream();
         setupWebSocket();
     }
-
     init();
 </script>
 </body>
 </html>
-

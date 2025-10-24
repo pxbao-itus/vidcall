@@ -4,6 +4,9 @@ import (
 	"html/template"
 	"net/http"
 	"os"
+	"time"
+
+	"vidcall/internal/module/room"
 
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -14,14 +17,16 @@ var Module = fx.Module("view",
 )
 
 type Handler struct {
-	template *template.Template
-	logger   *zap.Logger
+	template    *template.Template
+	logger      *zap.Logger
+	roomService *room.Service
 }
 
 type HandlerParams struct {
 	fx.In
 
-	Logger *zap.Logger
+	Logger      *zap.Logger
+	RoomService *room.Service
 }
 
 func NewHandler(params HandlerParams) *Handler {
@@ -36,13 +41,30 @@ func NewHandler(params HandlerParams) *Handler {
 	}
 
 	return &Handler{
-		template: tmpl,
+		template:    tmpl,
+		logger:      params.Logger,
+		roomService: params.RoomService,
 	}
 }
 
 func (handler *Handler) RenderHomepage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if err := handler.template.ExecuteTemplate(w, "index.html", nil); err != nil {
+
+	rooms, err := handler.roomService.ListRooms(r.Context())
+	if err != nil {
+		handler.logger.Error("Failed to list rooms", zap.Error(err))
+		rooms = []room.Room{}
+	}
+
+	// Generate a random ID for new users
+	randomID := time.Now().Unix()
+
+	data := map[string]interface{}{
+		"Rooms":    rooms,
+		"RandomID": randomID,
+	}
+
+	if err := handler.template.ExecuteTemplate(w, "index.html", data); err != nil {
 		http.Error(w, "Failed to render template", http.StatusInternalServerError)
 		return
 	}
@@ -50,7 +72,15 @@ func (handler *Handler) RenderHomepage(w http.ResponseWriter, r *http.Request) {
 
 func (handler *Handler) RenderCallPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if err := handler.template.ExecuteTemplate(w, "call.html", nil); err != nil {
+
+	// Get roomID from URL path using chi URLParam
+	roomID := r.PathValue("roomID")
+
+	data := map[string]interface{}{
+		"RoomID": roomID,
+	}
+
+	if err := handler.template.ExecuteTemplate(w, "call.html", data); err != nil {
 		http.Error(w, "Failed to render template", http.StatusInternalServerError)
 		return
 	}

@@ -21,6 +21,7 @@ var Module = fx.Module(
 type Server struct {
 	server *http.Server
 	logger *zap.Logger
+	config config.HttpServer
 }
 
 type ServerParams struct {
@@ -44,6 +45,7 @@ func newServer(params ServerParams) ServerResult {
 			Handler: params.Handler,
 		},
 		logger: params.Logger,
+		config: params.Config.HttpServer,
 	}
 
 	return ServerResult{
@@ -71,10 +73,28 @@ func Invoke() func(server *Server) {
 }
 
 func (s *Server) Start(ctx context.Context) {
+	protocol := "HTTP"
+	if s.config.UseHTTPS {
+		protocol = "HTTPS"
+	}
+
 	s.logger.Info("Starting server",
+		zap.String("protocol", protocol),
 		zap.String("addr", s.server.Addr),
 	)
-	if err := s.server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+
+	var err error
+	if s.config.UseHTTPS {
+		s.logger.Info("Using HTTPS",
+			zap.String("cert", s.config.CertFile),
+			zap.String("key", s.config.KeyFile),
+		)
+		err = s.server.ListenAndServeTLS(s.config.CertFile, s.config.KeyFile)
+	} else {
+		err = s.server.ListenAndServe()
+	}
+
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		s.logger.Fatal("Server failed", zap.Error(err))
 	}
 }

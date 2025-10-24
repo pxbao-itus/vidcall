@@ -6,8 +6,7 @@ import (
 	"fmt"
 	"sort"
 	"time"
-	
-	"vidcall/internal/common"
+
 	"vidcall/pkg/repository"
 
 	"go.uber.org/fx"
@@ -37,7 +36,7 @@ func NewService(params ServiceParams) *Service {
 
 func (service *Service) CreateRoom(ctx context.Context, room Room) (Room, error) {
 	room.CreatedAt = time.Now().Unix()
-	room.Subscribers = make(map[string]chan Event, 2)
+	room.Subscribers = make(map[string]chan Event)
 	return service.repo.Insert(ctx, room)
 }
 
@@ -53,14 +52,7 @@ func (service *Service) DeleteRoom(ctx context.Context, id string) error {
 
 	// Close the signal channel if it exists and have not been closed yet
 	eventRoomDeleted := Event{EventName: EventRoomDeleted}
-	for _, subscriber := range room.Subscribers {
-		if subscriber != nil {
-			if _, ok := <-subscriber; ok {
-				subscriber <- eventRoomDeleted
-				close(subscriber)
-			}
-		}
-	}
+	room.emitEvent("", eventRoomDeleted)
 
 	return service.repo.Delete(ctx, id)
 }
@@ -78,7 +70,7 @@ func (service *Service) ListRooms(ctx context.Context) ([]Room, error) {
 			continue
 		}
 
-		if room.ShouldDelete() {
+		if room.shouldDelete() {
 			if err := service.DeleteRoom(ctx, room.ID); err != nil {
 				return nil, fmt.Errorf("delete expired room %s: %w", room.ID, err)
 			}
@@ -119,7 +111,7 @@ func (service *Service) JoinRoom(ctx context.Context, roomID, userID string) (Ro
 		return Room{}, err
 	}
 
-	if room.ShouldDelete() {
+	if room.shouldDelete() {
 		if err := service.DeleteRoom(ctx, roomID); err != nil {
 			return Room{}, fmt.Errorf("delete expired room: %w", err)
 		}
@@ -131,24 +123,7 @@ func (service *Service) JoinRoom(ctx context.Context, roomID, userID string) (Ro
 		return Room{}, ErrRoomIsFull
 	}
 
-	// Add user to the room if there's an empty slot
-	if room.Users[0] == nil {
-		room.Users[0] = common.Pointer(userID)
-	} else if room.Users[1] == nil {
-		room.Users[1] = common.Pointer(userID)
-	}
-
-	room.Subscribers[userID] = make(chan Event, 5) // Buffered channel to avoid blocking
-
-	// emit event to subscribers that a new user has joined
-	for id, subscriber := range room.Subscribers {
-		if id != userID {
-			subscriber <- Event{
-				EventName: EventNewComer,
-				Data:      userID,
-			}
-		}
-	}
+	room.AddGuest(userID)
 
 	room, err = service.repo.Update(ctx, room)
 	if err != nil {
@@ -161,29 +136,16 @@ func (service *Service) JoinRoom(ctx context.Context, roomID, userID string) (Ro
 func (service *Service) LeaveRoom(ctx context.Context, roomID, userID string) error {
 	room, err := service.repo.Find(ctx, roomID)
 	if err != nil {
+		if errors.Is(err, repository.ErrNotFound) {
+			return nil
+		}
+		
 		return err
 	}
 
-	// Remove user from the room
-	if common.PointerVal(room.Users[0]) == userID {
-		room.Users[0] = nil
-	} else if common.PointerVal(room.Users[1]) == userID {
-		room.Users[1] = nil
-	} else {
-		return ErrUserNotInRoom
-	}
+	room.RemoveGuest(userID)
 
-	// emit to subscribers that a user has left
-	for id, subscriber := range room.Subscribers {
-		if id != userID {
-			subscriber <- Event{
-				EventName: EventLeaveRoom,
-				Data:      userID,
-			}
-		}
-	}
-
-	if room.ShouldDelete() {
+	if room.shouldDelete() {
 		if err := service.DeleteRoom(ctx, roomID); err != nil {
 			return fmt.Errorf("delete expired room: %w", err)
 		}
@@ -196,4 +158,13 @@ func (service *Service) LeaveRoom(ctx context.Context, roomID, userID string) er
 	}
 
 	return nil
+}
+
+func (service *Service) EmitEvent(roomID, userID string, event Event) {
+	room, err := service.repo.Find(context.Background(), roomID)
+	if err != nil {
+		return
+	}
+
+	room.emitEvent(userID, event)
 }

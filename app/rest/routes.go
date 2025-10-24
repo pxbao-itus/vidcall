@@ -56,7 +56,7 @@ func NewRouter(params RouterParams) *chi.Mux {
 	router.Post("/users", params.UserHandler.CreateUser)
 	router.Get("/users/{userID}", params.UserHandler.GetUser)
 
-	router.Get("/ws/{roomID}", params.RTCHandler.JoinRoom)
+	router.Get("/ws/rooms/{roomID}", params.RTCHandler.JoinRoom)
 
 	return router
 }

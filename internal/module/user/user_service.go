@@ -29,7 +29,12 @@ func (service *Service) GetUser(ctx context.Context, ID string) (User, error) {
 	return service.repo.Find(ctx, ID)
 }
 
-func (service *Service) CreateUser(ctx context.Context, user User) (User, error) {
+func (service *Service) CreateOrUpdateUser(ctx context.Context, user User) (User, error) {
+	if existingUser, err := service.repo.Find(ctx, user.ID); err == nil {
+		existingUser.LastActive = time.Now()
+		return service.repo.Update(ctx, existingUser)
+	}
+
 	user.LastActive = time.Now()
 	return service.repo.Insert(ctx, user)
 }
