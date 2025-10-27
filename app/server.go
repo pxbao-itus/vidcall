@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"time"
 
 	"vidcall/app/rest"
 	"vidcall/config"
@@ -62,6 +63,8 @@ func NewServer(lc fx.Lifecycle, params ServerParams) ServerResult {
 		},
 		OnStop: func(ctx context.Context) error {
 			result.Server.Shutdown(ctx)
+			// wait for a moment to ensure shutdown completes
+			time.Sleep(2 * time.Second)
 			return nil
 		},
 	})
